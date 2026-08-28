@@ -1,0 +1,6 @@
+.agents/
+.template-work/
+.git-broken-placeholder/
+node_modules/
+dist/
+.DS_Store

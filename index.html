@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liam C++ Foundations</title>
+    <meta name="description" content="A beginner-friendly C++ course migrated from GitBook into an independent static website.">
+    <link rel="icon" type="image/png" href="assets/liam-icon.png">
+    <link rel="apple-touch-icon" href="assets/liam-icon.png">
+    <link rel="stylesheet" href="styles.css?v=icon-style">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="assets/liam-icon.png" alt="Liam icon">
+          </div>
+          <div>
+            <p class="eyebrow">Course Library</p>
+            <h1>Liam C++</h1>
+          </div>
+        </div>
+        <div class="course-meter" aria-label="Course progress">
+          <div>
+            <span>Course progress</span>
+            <strong id="coursePercent">0%</strong>
+          </div>
+          <div class="course-meter-track">
+            <div id="courseProgressFill"></div>
+          </div>
+        </div>
+        <label class="search">
+          <span>Search</span>
+          <input id="searchInput" type="search" placeholder="Find a lesson">
+        </label>
+        <nav class="nav" id="nav"></nav>
+      </aside>
+
+      <main class="page">
+        <header class="topbar">
+          <button class="icon-button menu-button" id="menuButton" aria-label="Open lesson menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div class="lesson-header">
+            <div class="breadcrumb" id="breadcrumb">Course</div>
+            <div class="topbar-title">
+              <span id="sectionLabel">Course</span>
+              <strong id="currentTitle">Loading...</strong>
+            </div>
+          </div>
+          <nav class="lesson-tabs" id="lessonTabs" aria-label="Lesson resources"></nav>
+          <div class="lesson-counter" id="lessonCounter">0 / 0</div>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+        </header>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="workspace">
+          <div class="reader">
+            <article class="content" id="content">
+              <div class="loading">Loading course content...</div>
+            </article>
+
+            <footer class="pager" id="pager"></footer>
+          </div>
+          <aside class="outline" id="outline" aria-label="On this page"></aside>
+        </div>
+      </main>
+    </div>
+
+    <script src="data/content-data.js?v=file-safe"></script>
+    <script src="app.js?v=icon-style"></script>
+  </body>
+</html>
