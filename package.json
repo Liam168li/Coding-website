@@ -1,0 +1,12 @@
+{
+  "name": "liam-cpp-course-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node scripts/server.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

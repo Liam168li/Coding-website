@@ -77,6 +77,32 @@
       </main>
     </div>
 
+    <section class="chatbot" id="chatbot" aria-label="Course chatbot">
+      <button class="chatbot-toggle" id="chatbotToggle" type="button" aria-expanded="false" aria-controls="chatbotPanel">
+        Ask Liam
+      </button>
+      <div class="chatbot-panel" id="chatbotPanel" hidden>
+        <div class="chatbot-header">
+          <div>
+            <span>Course assistant</span>
+            <strong>Ask about C++ lessons</strong>
+          </div>
+          <button class="chatbot-close" id="chatbotClose" type="button" aria-label="Close chat">x</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages" role="log" aria-live="polite">
+          <div class="chat-message assistant">Hi! Ask me about the Liam C++ lessons, examples, setup, or exercises.</div>
+        </div>
+        <form class="chatbot-form" id="chatbotForm">
+          <label for="chatbotInput">Question</label>
+          <textarea id="chatbotInput" rows="2" maxlength="420" placeholder="Why do we use cin?"></textarea>
+          <div class="chatbot-actions">
+            <span id="chatbotStatus">Scoped to this course</span>
+            <button type="submit">Ask</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <script src="data/content-data.js?v=file-safe"></script>
     <script src="app.js?v=icon-style"></script>
   </body>

@@ -2,6 +2,8 @@ const state = {
   pages: [],
   assets: {},
   currentIndex: 0,
+  chatHistory: [],
+  chatOpen: false,
 };
 
 const sourceRoot = "https://liam-2.gitbook.io/liam";
@@ -21,6 +23,14 @@ const lessonCounter = document.querySelector("#lessonCounter");
 const coursePercent = document.querySelector("#coursePercent");
 const courseProgressFill = document.querySelector("#courseProgressFill");
 const outline = document.querySelector("#outline");
+const chatbot = document.querySelector("#chatbot");
+const chatbotToggle = document.querySelector("#chatbotToggle");
+const chatbotPanel = document.querySelector("#chatbotPanel");
+const chatbotClose = document.querySelector("#chatbotClose");
+const chatbotMessages = document.querySelector("#chatbotMessages");
+const chatbotForm = document.querySelector("#chatbotForm");
+const chatbotInput = document.querySelector("#chatbotInput");
+const chatbotStatus = document.querySelector("#chatbotStatus");
 
 init();
 
@@ -87,6 +97,10 @@ function bindEvents() {
     event.preventDefault();
     document.getElementById(link.dataset.outlineTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+
+  chatbotToggle.addEventListener("click", () => setChatOpen(!state.chatOpen));
+  chatbotClose.addEventListener("click", () => setChatOpen(false));
+  chatbotForm.addEventListener("submit", handleChatSubmit);
 }
 
 function openFromHash() {
@@ -113,6 +127,83 @@ function openPage(index) {
   updateProgress();
   document.body.classList.remove("menu-open");
   window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function setChatOpen(isOpen) {
+  state.chatOpen = isOpen;
+  chatbot.classList.toggle("is-open", isOpen);
+  chatbotPanel.hidden = !isOpen;
+  chatbotToggle.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    requestAnimationFrame(() => chatbotInput.focus());
+  }
+}
+
+async function handleChatSubmit(event) {
+  event.preventDefault();
+
+  const question = chatbotInput.value.trim();
+  if (!question) return;
+
+  chatbotInput.value = "";
+  appendChatMessage("user", question);
+  state.chatHistory.push({ role: "user", content: question });
+  trimChatHistory();
+  setChatLoading(true);
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        question,
+        currentSlug: state.pages[state.currentIndex]?.slug || "",
+        history: state.chatHistory.slice(-6),
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) throw new Error(data.error || "Chat request failed.");
+
+    appendChatMessage("assistant", data.answer || "I could not answer that one. Please try again.");
+    state.chatHistory.push({ role: "assistant", content: data.answer || "" });
+    trimChatHistory();
+    chatbotStatus.textContent = data.sources?.length
+      ? `Using ${data.sources[0].title}`
+      : "Scoped to this course";
+  } catch (error) {
+    appendChatMessage("assistant", error.message || "Chat is unavailable right now.");
+    chatbotStatus.textContent = "Chat unavailable";
+  } finally {
+    setChatLoading(false);
+  }
+}
+
+function appendChatMessage(role, text) {
+  const message = document.createElement("div");
+  message.className = `chat-message ${role}`;
+  message.innerHTML = formatChatText(text);
+  chatbotMessages.append(message);
+  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function formatChatText(text) {
+  return escapeHtml(text)
+    .replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\n{2,}/g, "</p><p>")
+    .replace(/\n/g, "<br>");
+}
+
+function setChatLoading(isLoading) {
+  chatbotForm.classList.toggle("is-loading", isLoading);
+  chatbotForm.querySelector("button").disabled = isLoading;
+  chatbotInput.disabled = isLoading;
+  if (isLoading) chatbotStatus.textContent = "Thinking...";
+}
+
+function trimChatHistory() {
+  state.chatHistory = state.chatHistory.slice(-8);
 }
 
 function renderLessonTabs(page) {

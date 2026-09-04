@@ -2,5 +2,7 @@
 .template-work/
 .git-broken-placeholder/
 node_modules/
+.pnpm-store/
 dist/
 .DS_Store
+.env
