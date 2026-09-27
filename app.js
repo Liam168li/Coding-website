@@ -80,6 +80,19 @@ function bindEvents() {
   });
 
   content.addEventListener("click", async (event) => {
+    const emailButton = event.target.closest(".credits-email");
+    if (emailButton) {
+      await copyText(emailButton.dataset.email || "");
+      const action = emailButton.querySelector(".credits-email-action");
+      emailButton.classList.add("is-copied");
+      if (action) action.textContent = "Copied";
+      setTimeout(() => {
+        emailButton.classList.remove("is-copied");
+        if (action) action.textContent = "Copy";
+      }, 1600);
+      return;
+    }
+
     const button = event.target.closest(".copy-code");
     if (!button) return;
 
@@ -113,11 +126,12 @@ function openPage(index) {
   state.currentIndex = index;
   const page = state.pages[index];
   content.classList.remove("content-enter");
+  content.classList.toggle("content--credits", page.kind === "credits");
   currentTitle.textContent = page.title;
   sectionLabel.textContent = groupTitle(page.slug);
   breadcrumb.textContent = `${groupTitle(page.slug)} / ${page.title}`;
   document.title = `${page.title} | Liam C++ Course`;
-  content.innerHTML = markdownToHtml(page.markdown);
+  content.innerHTML = page.kind === "credits" ? creditsPageHtml(page) : markdownToHtml(page.markdown);
   requestAnimationFrame(() => content.classList.add("content-enter"));
   renderNav(searchInput.value);
   renderLessonTabs(page);
@@ -251,7 +265,16 @@ function renderOutline() {
 }
 
 function renderCourseProgress(page) {
-  const percent = Math.round(((state.currentIndex + 1) / state.pages.length) * 100);
+  if (page.kind === "credits") {
+    coursePercent.textContent = "Info";
+    courseProgressFill.style.width = "100%";
+    lessonCounter.textContent = "Credits";
+    return;
+  }
+
+  const coursePages = state.pages.filter((item) => item.kind !== "credits");
+  const courseIndex = coursePages.findIndex((item) => item.slug === page.slug);
+  const percent = Math.round(((courseIndex + 1) / coursePages.length) * 100);
   coursePercent.textContent = `${percent}%`;
   courseProgressFill.style.width = `${percent}%`;
 
@@ -340,11 +363,35 @@ function updateProgress() {
 }
 
 function groupTitle(slug) {
+  if (slug === "credits") return "About";
   if (!slug.includes("/")) return "Start Here";
   const [first] = slug.split("/");
   if (first === "how-to-begin-with-c++") return "Setup";
   if (first.startsWith("module-")) return `Module ${first.replace("module-", "")}`;
   return titleCase(first.replaceAll("-", " "));
+}
+
+function creditsPageHtml(page) {
+  const name = escapeHtml(page.name || "Haochen Li");
+  const email = escapeHtml(page.email || "haochen.123.li@gmail.com");
+
+  return `
+    <section class="credits-page" aria-labelledby="credits-title">
+      <p class="credits-kicker">Liam C++ · Credits</p>
+      <div class="credits-card">
+        <div class="credits-monogram" aria-hidden="true">HL</div>
+        <div class="credits-details">
+          <span>Created by</span>
+          <h1 id="credits-title">${name}</h1>
+          <button class="credits-email" type="button" data-email="${email}" aria-label="Copy ${email}">
+            <span>${email}</span>
+            <span class="credits-email-action">Copy</span>
+          </button>
+        </div>
+      </div>
+      <p class="credits-note">Course design, content, and development.</p>
+    </section>
+  `;
 }
 
 function markdownToHtml(markdown) {
